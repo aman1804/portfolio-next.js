@@ -1,5 +1,12 @@
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.min.css";
+import './cover.css'
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+
+import NextTopLoader from "nextjs-toploader";
+// import Loader from "./loading";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,8 +17,19 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className="h-100">
+      <body
+        className={`${inter.className} d-flex h-100 text-center text-white bg-black`}
+      >
+        <NextTopLoader />
+
+        <div className="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+          <NavBar />
+
+          {children}
+          <Footer />
+        </div>
+      </body>
     </html>
   );
 }

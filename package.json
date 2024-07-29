@@ -9,8 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "next": "14.2.4",
+    "nextjs-toploader": "^1.6.12",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.4"
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.5"
   }
 }

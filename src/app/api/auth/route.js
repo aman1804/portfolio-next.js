@@ -1,7 +1,7 @@
 // import { NodeNextResponse } from "next/dist/server/base-http/node";
 import { NextResponse } from "next/server";
 import { openDB } from "../../../../lib/db";
-i
+
 export async function GET(){
     return NextResponse.json({result:true},{status:201})
 }

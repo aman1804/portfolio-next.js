@@ -5,7 +5,7 @@ import { openDB } from '../../../../../lib/db';
 export async function GET(req, { params }) {
     const { userId } = params;
     const db = await openDB();
-    console.log(req)
+    // console.log(req)
     try {
         const user = await db.get('SELECT * FROM PersonalInfo WHERE user_id = ?', [userId]);
 

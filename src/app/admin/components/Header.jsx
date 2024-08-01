@@ -72,6 +72,18 @@ const Header = () => {
           <li className="nav-item">
             <Link
               className={`nav-link fw-bold py-1 px-0 ${
+                pathname === "/admin/resume" ? "active text-white" : "text-white-50"
+              }`}
+              aria-current={pathname === "/admin/resume" ? "page" : undefined}
+              href="/admin/resume"
+            >
+              Resume
+            </Link>
+          </li>
+
+          <li className="nav-item">
+            <Link
+              className={`nav-link fw-bold py-1 px-0 ${
                 pathname === "/" ? "active text-white" : "text-white-50"
               }`}
               aria-current={pathname === "/" ? "page" : undefined}

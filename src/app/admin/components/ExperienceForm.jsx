@@ -1,7 +1,9 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { deleteData, getData, postData } from '../../../../lib/apiServices';
+import Spinner from '../helpers/Spinner';
 
-const ExperienceForm = () => {
+const ExperienceForm = ({ userId }) => {
     const [experiences, setExperiences] = useState([{
         company_name: '',
         position: '',
@@ -9,6 +11,26 @@ const ExperienceForm = () => {
         end_date: '',
         responsibilities: ''
     }]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const response = await getData(`/api/experiences/${userId}`);
+            if (response) {
+                console.log(response);
+                setExperiences(response);
+            }
+        } catch (error) {
+            console.error('Error fetching experience data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const handleChange = (index, event) => {
         const values = [...experiences];
@@ -26,30 +48,58 @@ const ExperienceForm = () => {
         }]);
     };
 
-    const handleRemoveExperience = (index) => {
+    const handleRemoveExperience = async (index, experienceId) => {
         const values = [...experiences];
+        if (experienceId) {
+            setLoading(true);
+            try {
+                const response = await deleteData(`/api/experiences/${experienceId}`);
+                if (response.success) {
+                    alert(response.message);
+                } else {
+                    alert(response.error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error deleting experience:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
         values.splice(index, 1);
         setExperiences(values);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Handle form submission logic here
-        console.log(experiences);
+        setLoading(true);
+        try {
+            const response = await postData(`/api/experiences/${userId}`, experiences);
+            if (response) {
+                alert(response.message);
+            }
+        } catch (error) {
+            console.error('Error submitting experience data:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="container">
+        <div className="container mt-4">
             <h2>Experience Form</h2>
+            {loading ? (
+                <Spinner/>
+            ):(
             <form onSubmit={handleSubmit}>
                 {experiences.map((experience, index) => (
                     <div className="row mb-3 p-3 border rounded" key={index}>
                         <span>
-                        {experiences.length > 1 && (
+                            {experiences.length > 1 && (
                                 <button
                                     type="button"
                                     className="float-end btn-close btn-close-white"
-                                    onClick={() => handleRemoveExperience(index)}
+                                    onClick={() => handleRemoveExperience(index, experience.id)}
                                 >
                                 </button>
                             )}
@@ -110,7 +160,6 @@ const ExperienceForm = () => {
                                 rows="3"
                             ></textarea>
                         </div>
-                        
                     </div>
                 ))}
                 <button
@@ -122,6 +171,7 @@ const ExperienceForm = () => {
                 </button>
                 <button type="submit" className="btn btn-success">Save</button>
             </form>
+            )}
         </div>
     );
 };

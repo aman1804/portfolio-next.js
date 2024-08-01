@@ -1,15 +1,13 @@
-// app/api/projects/route.js
-
 import { NextResponse } from 'next/server';
 import { openDB } from '../../../../../lib/db';
 
-export async function GET(req,{ params }) {
+export async function GET(req, { params }) {
   try {
     const db = await openDB();
-    const { id } = params
+    const { id } = params;
 
-    const skills = await db.all('SELECT * FROM Skills WHERE user_id=?',[id]); 
-    return NextResponse.json({ skills },{status:200});
+    const projects = await db.all('SELECT * FROM Projects WHERE user_id=?', [id]);
+    return NextResponse.json(projects , { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
@@ -17,10 +15,11 @@ export async function GET(req,{ params }) {
 }
 
 
-export async function POST(request,{params}) {
+
+export async function POST(request, { params }) {
   const db = await openDB();
   const data = await request.json();
-  const { id } = params
+  const { id } = params;
 
   if (!Array.isArray(data) || data.length === 0) {
     return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
@@ -30,19 +29,19 @@ export async function POST(request,{params}) {
     // Start a transaction
     await db.exec('BEGIN TRANSACTION');
 
-    for (const skill of data) {
-      if (skill.id) {
+    for (const project of data) {
+      if (project.id) {
         // Update existing records
         await db.run(
-          `UPDATE Skills SET user_id = ?, skill_name = ?, proficiency_level = ? WHERE id = ?`,
-          [id, skill.skill_name, skill.proficiency_level, skill.id]
+          `UPDATE Projects SET user_id = ?, title = ?, description = ?, url = ?, start_date = ?, end_date = ?, technologies = ?, github_link = ? WHERE id = ?`,
+          [id, project.title, project.description, project.url, project.start_date, project.end_date, project.technologies, project.github_link, project.id]
         );
       } else {
         // Insert new records
         await db.run(
-          `INSERT INTO Skills (user_id, skill_name, proficiency_level) 
-          VALUES (?, ?, ?)`,
-          [id, skill.skill_name, skill.proficiency_level]
+          `INSERT INTO Projects (user_id, title, description, url, start_date, end_date, technologies, github_link) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [id, project.title, project.description, project.url, project.start_date, project.end_date, project.technologies, project.github_link]
         );
       }
     }
@@ -50,7 +49,7 @@ export async function POST(request,{params}) {
     // Commit the transaction
     await db.exec('COMMIT');
     
-    return NextResponse.json({ success: true , message:"Data Save Successfully!"},{status:200});
+    return NextResponse.json({ success: true, message: "Data Saved Successfully!" }, { status: 200 });
   } catch (error) {
     // Rollback the transaction on error
     await db.exec('ROLLBACK');
@@ -59,10 +58,9 @@ export async function POST(request,{params}) {
   }
 }
 
-
-export async function DELETE(request,{params}) {
+export async function DELETE(request, { params }) {
   const db = await openDB();
-  const { id } =  params;
+  const { id } = params;
 
   if (!id) {
     return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -73,12 +71,12 @@ export async function DELETE(request,{params}) {
     await db.exec('BEGIN TRANSACTION');
     
     // Delete the record
-    await db.run('DELETE FROM Skills WHERE id = ?', [id]);
+    await db.run('DELETE FROM Projects WHERE id = ?', [id]);
     
     // Commit the transaction
     await db.exec('COMMIT');
     
-    return NextResponse.json({ success: true , message:"Deleted Successfully!"},{status:200});
+    return NextResponse.json({ success: true, message: "Deleted Successfully!" }, { status: 200 });
   } catch (error) {
     // Rollback the transaction on error
     await db.exec('ROLLBACK');

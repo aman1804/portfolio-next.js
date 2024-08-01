@@ -1,7 +1,9 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { deleteData, getData, postData } from '../../../../lib/apiServices'; // Adjust the import based on your API service
+import Spinner from '../helpers/Spinner';
 
-const ProjectsForm = () => {
+const ProjectsForm = ({ userId }) => {
     const [projects, setProjects] = useState([{
         title: '',
         description: '',
@@ -11,6 +13,25 @@ const ProjectsForm = () => {
         technologies: '',
         github_link: ''
     }]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const response = await getData(`/api/projects/${userId}`); // Replace with your API endpoint
+            if (response) {
+                setProjects(response);
+            }
+        } catch (error) {
+            console.error('Error fetching projects data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [userId]);
 
     const handleChange = (index, event) => {
         const values = [...projects];
@@ -30,32 +51,63 @@ const ProjectsForm = () => {
         }]);
     };
 
-    const handleRemoveProject = (index) => {
+    const handleRemoveProject = async (index, projectId) => {
+        if (projectId) {
+            setLoading(true);
+            try {
+                const response = await deleteData(`/api/projects/${projectId}`); // Replace with your API endpoint
+                if (response.success) {
+                    alert(response.message);
+                } else {
+                    alert(response.error);
+                }
+            } catch (error) {
+                console.error('Error deleting project data:', error);
+                alert('An error occurred while deleting the project.');
+            } finally {
+                setLoading(false);
+            }
+        }
         const values = [...projects];
         values.splice(index, 1);
         setProjects(values);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Handle form submission logic here
-        console.log(projects);
+        setLoading(true);
+        try {
+            const response = await postData(`/api/projects/${userId}`, projects); // Replace with your API endpoint
+            if (response) {
+                alert(response.message || 'Projects saved successfully');
+            }
+        } catch (error) {
+            console.error('Error submitting projects data:', error);
+            alert('An error occurred while saving the projects.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="container ">
+        <div className="container mt-4">
             <h2>Projects Form</h2>
+            {loading && (
+                <Spinner/>
+            )}
             <form onSubmit={handleSubmit}>
                 {projects.map((project, index) => (
                     <div className="row mb-3 p-3 border rounded" key={index}>
-                        <span>{projects.length > 1 && (
+                        <span>
+                            {projects.length > 1 && (
                                 <button
                                     type="button"
                                     className="btn-close btn-close-white float-end"
-                                    onClick={() => handleRemoveProject(index)}
+                                    onClick={() => handleRemoveProject(index, project.id)}
                                 >
                                 </button>
-                            )}</span>
+                            )}
+                        </span>
                         <div className="col-md-6 form-group">
                             <label htmlFor={`title_${index}`}>Title</label>
                             <input
@@ -134,7 +186,6 @@ const ProjectsForm = () => {
                                 onChange={(e) => handleChange(index, e)}
                             />
                         </div>
-                        
                     </div>
                 ))}
                 <button

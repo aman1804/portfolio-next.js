@@ -1,7 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { getData, getData_By_userId } from '../../../../lib/apiServices';
-// import axios from 'axios'; // Assuming you're using axios for HTTP requests
+import { getData_By_userId } from '../../../../lib/apiServices'; // Update with the correct import path
 
 async function updatePersonalInfo(userId, formData) {
     try {
@@ -22,10 +21,32 @@ async function updatePersonalInfo(userId, formData) {
         return result;
     } catch (error) {
         console.error('Error updating data:', error);
+        throw error;
     }
 }
 
+async function savePersonalInfo(formData) {
+    try {
+        const response = await fetch('/api/personal-info', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Save successful:', result);
+        return result;
+    } catch (error) {
+        console.error('Error saving data:', error);
+        throw error;
+    }
+}
 
 const PersonalInfoForm = ({ userId }) => {
     const [formData, setFormData] = useState({
@@ -41,20 +62,25 @@ const PersonalInfoForm = ({ userId }) => {
         github: '',
         profile_img: ''
     });
-
     const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const response = await getData_By_userId(`/api/personal-info/${userId}`);
                 if (response) {
                     setFormData(response);
                     setIsEditing(true);
-                    console.log(response)
+                    console.log(response);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setError('Error fetching data.');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -73,24 +99,39 @@ const PersonalInfoForm = ({ userId }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true);
+        setError(null);
         try {
             if (isEditing) {
-                // Update existing data
-                await updatePersonalInfo(userId,formData);
-                console.log('Data updated:', formData);
+                await updatePersonalInfo(userId, formData);
+                alert('Data updated successfully.');
             } else {
-                // Save new data
-                await axios.post('/api/personal-info', formData);
-                console.log('Data saved:', formData);
+                await savePersonalInfo(formData);
+                alert('Data saved successfully.');
             }
         } catch (error) {
             console.error('Error saving data:', error);
+            setError('Error saving data.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="container">
             <h2>{isEditing ? 'Edit Personal Information' : 'Personal Information Form'}</h2>
+            {loading && (
+                <div className="text-center mb-3">
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            )}
+            {error && (
+                <div className="alert alert-danger" role="alert">
+                    {error}
+                </div>
+            )}
             <form onSubmit={handleSubmit} className='row p-3 border rounded'>
                 <div className="col-12">
                     <div className="row mb-3">

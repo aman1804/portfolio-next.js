@@ -1,17 +1,12 @@
 import React from "react";
 import "./page.module.css";
+import { getData } from "../../../lib/apiServices";
 
-export async function getProjects() {
-  var data = await fetch("http://localhost:3000/api/projects", {
-    cache: 'no-store', // Ensure fresh data fetching
-  });
 
-  return await data.json();
-}
 const page = async () => {
-  const data = await getProjects();
+  const data = await getData('/api/projects');
   const projects = data.projects;
-  console.log('projects',projects);
+  // console.log('projects',projects);
   return (
     <div className="">
       <ol className="list-group list-group-numbered bg-transparent text-start">

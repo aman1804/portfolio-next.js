@@ -31,7 +31,7 @@ const EducationForm = ({ userId }) => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [userId]);
 
     const handleChange = (index, event) => {
         const values = [...educations];

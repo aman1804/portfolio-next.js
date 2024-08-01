@@ -4,11 +4,6 @@ import LoginForm from './components/LoginForm'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export async function getData(){
-    const data = await fetch("https://dummy.restapiexample.com/api/v1/employees")
-    return await data.json()
-}
-
 
 const Login = async() => {
     // const data = await getData()
@@ -20,7 +15,7 @@ const Login = async() => {
     if (user) {
       redirect('/admin'); // Redirect to the dashboard if the user is authenticated
     }
-    console.log(cookies())
+    // console.log(cookies())
   return (
     <div className='m-auto w-50 d-flex align-items-center py-4' >
       <LoginForm/>

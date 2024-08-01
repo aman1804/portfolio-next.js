@@ -1,9 +1,14 @@
 import React from 'react'
 import PersonalInfoForm from './components/PersonalInfoForm'
 import getCookies from './helpers/getCookie';
+import { redirect } from 'next/navigation';
 
-const Admin = () => {
-  let user = getCookies('user');
+const Admin = async() => {
+  let user = await getCookies('user');
+
+  if (!user) {
+    redirect('/login'); // Redirect to the dashboard if the user is authenticated
+  }
   // console.log(user)
   return (
     <div className='card-body' >

@@ -1,7 +1,7 @@
 // import { NodeNextResponse } from "next/dist/server/base-http/node";
 import { NextResponse } from "next/server";
 import { openDB } from "../../../../lib/db";
-import { cookies } from "next/headers";
+i
 export async function GET(){
     return NextResponse.json({result:true},{status:201})
 }
@@ -35,6 +35,6 @@ export async function POST(req) {
         return NextResponse.json({ message: "Not Found" }, { status: 401 });
     } catch (error) {
         console.error('Error processing request', error);
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ message: "Internal Server Error ",error }, { status: 500 });
     }
 }

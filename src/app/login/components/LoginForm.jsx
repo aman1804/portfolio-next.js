@@ -4,14 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import style from '../page.module.css';
 import { postData } from '../../../../lib/apiServices';
-
-const Loader = () => (
-  <div className="d-flex justify-content-center align-items-center">
-    <div className="spinner-border text-white" role="status">
-      <span className="visually-hidden">Loading...</span>
-    </div>
-  </div>
-);
+import Spinner from '@/app/admin/helpers/Spinner';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -30,9 +23,6 @@ const LoginForm = () => {
 
       // Redirect to the desired page if login is successful
       if (res.user) {
-        // Store user data in localStorage
-        localStorage.setItem('user', JSON.stringify(res.user));
-        
         router.push('/admin'); // Change '/dashboard' to your target route
       } else {
         setError('Invalid credentials');
@@ -51,7 +41,7 @@ const LoginForm = () => {
         <div className="card-body">
           <h5 className="card-title text-center mb-4">Login</h5>
           {loading ? (
-            <Loader />
+            <Spinner />
           ) : (
             <form onSubmit={handleSubmit}>
                {error && <div className="alert alert-danger">{error}</div>}

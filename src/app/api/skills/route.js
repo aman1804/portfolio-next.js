@@ -15,10 +15,9 @@ export async function GET() {
   }
 }
 
-export async function POST(request,{params}) {
+export async function POST(request) {
   const db = await openDB();
   const data = await request.json();
-  const { id } = params
 
   if (!Array.isArray(data) || data.length === 0) {
     return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
@@ -33,14 +32,14 @@ export async function POST(request,{params}) {
         // Update existing records
         await db.run(
           `UPDATE Skills SET user_id = ?, skill_name = ?, proficiency_level = ? WHERE id = ?`,
-          [id, skill.skill_name, skill.proficiency_level, skill.id]
+          [skill.user_id, skill.skill_name, skill.proficiency_level, skill.id]
         );
       } else {
         // Insert new records
         await db.run(
           `INSERT INTO Skills (user_id, skill_name, proficiency_level) 
           VALUES (?, ?, ?)`,
-          [id, skill.skill_name, skill.proficiency_level]
+          [skill.user_id, skill.skill_name, skill.proficiency_level]
         );
       }
     }

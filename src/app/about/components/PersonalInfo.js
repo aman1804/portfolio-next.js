@@ -16,7 +16,7 @@ const PersonalInfo = async() => {
             <span className="fw-semibold text-white-50">ABOUT</span>
             <span className="fs-4 fw-bolder text-white">LEARN MORE ABOUT ME</span>
               <div className="col-lg-4 mb-4 mb-lg-0">
-              <Image src={"/profileImage.jpg"} width={250} height={300} />
+              <Image src={"/profileImage.jpg"} width={250} height={300} alt='profile' />
               </div>
               <div className="col-lg-8 px-xl-10 text-white-50">
                 <div className="row">

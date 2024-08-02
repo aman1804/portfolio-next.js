@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import style from '../page.module.css';
-import { postData } from '../../../../lib/apiServices';
+// import { postData } from '../../../../lib/apiServices';
 import Spinner from '@/app/admin/helpers/Spinner';
+import { postData } from '@/app/admin/components/apihandle';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');

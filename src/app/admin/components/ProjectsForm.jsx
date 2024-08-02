@@ -20,7 +20,8 @@ const ProjectsForm = ({ userId }) => {
         try {
             const response = await getData(`/api/projects/${userId}`); // Replace with your API endpoint
             if (response) {
-                setProjects(response);
+                console.log(response)
+                setProjects(response.projects);
             }
         } catch (error) {
             console.error('Error fetching projects data:', error);

@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { getData_By_userId } from '../../../../lib/apiServices'; // Update with the correct import path
+import { getData_By_userId, postData } from '../../../../lib/apiServices'; // Update with the correct import path
 
 async function updatePersonalInfo(userId, formData) {
     try {
@@ -106,7 +106,7 @@ const PersonalInfoForm = ({ userId }) => {
                 await updatePersonalInfo(userId, formData);
                 alert('Data updated successfully.');
             } else {
-                await savePersonalInfo(formData);
+                await postData(`/api/personal-info/${userId}`,formData);
                 alert('Data saved successfully.');
             }
         } catch (error) {

@@ -5,30 +5,8 @@ import { useRouter } from 'next/navigation';
 import style from '../page.module.css';
 // import { postData } from '../../../../lib/apiServices';
 import Spinner from '@/app/admin/helpers/Spinner';
-// import { postData } from '@/app/admin/components/apihandle';
+import { postData } from '@/app/admin/components/apihandle';
 
-export async function postData(url, data, method = 'POST') {
-    try {
-      const response = await fetch(`https://aman-dubey-phi.vercel.app${url}`, {
-        method, // HTTP method (GET, POST, etc.)
-        cache: 'no-store', // Ensure fresh data fetching
-        headers: {
-          'Content-Type': 'application/json', // Set the appropriate headers
-        },
-        body: JSON.stringify(data), // Convert the data to JSON string
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-      throw error; // Re-throw the error to be handled by the calling code
-    }
-  }
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +20,6 @@ const LoginForm = () => {
     setLoading(true); // Show loader
     try {
       const res = await postData('/api/auth', { username: email, password });
-
       console.log(res);
 
       // Redirect to the desired page if login is successful

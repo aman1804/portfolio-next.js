@@ -1,7 +1,9 @@
 "use client"
 export async function postData(url, data, method = 'POST') {
     try {
-      const response = await fetch(`${process.env.BASE_URL}${url}`, {
+      // const b_url = await process.env.local.BASE_URL
+      // console.log('aaa', b_url )
+      const response = await fetch(`${url}`, {
         method, // HTTP method (GET, POST, etc.)
         cache: 'no-store', // Ensure fresh data fetching
         headers: {

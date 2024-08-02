@@ -1,84 +1,77 @@
+// app/api/projects/route.js
 import { NextResponse } from 'next/server';
-import { openDB } from '../../../../../lib/db';
+import { queryDB, runTransaction } from '../../../../../lib/db';
 
 export async function GET(req, { params }) {
+  const { id } = params;
   try {
-    const db = await openDB();
-    const { id } = params;
+    const result = await queryDB('SELECT * FROM Experience WHERE user_id = $1', [id]);
+    const experiences = result.rows;
 
-    const experiences = await db.all('SELECT * FROM Experience WHERE user_id=?', [id]);
-    return NextResponse.json( experiences , { status: 200 });
+    return NextResponse.json(experiences, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching data:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
 
 export async function POST(request, { params }) {
-    const db = await openDB();
-    const data = await request.json();
-    const { id } = params;
-  
-    if (!Array.isArray(data) || data.length === 0) {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
-    }
-  
-    try {
-      // Start a transaction
-      await db.exec('BEGIN TRANSACTION');
-  
-      for (const exp of data) {
-        if (exp.id) {
-          // Update existing records
-          await db.run(
-            `UPDATE Experience SET user_id = ?, company_name = ?, position = ?, start_date = ?, end_date = ?, responsibilities = ? WHERE id = ?`,
-            [id, exp.company_name, exp.position, exp.start_date, exp.end_date, exp.responsibilities, exp.id]
-          );
-        } else {
-          // Insert new records
-          await db.run(
-            `INSERT INTO Experience (user_id, company_name, position, start_date, end_date, responsibilities) 
-            VALUES (?, ?, ?, ?, ?, ?)`,
-            [id, exp.company_name, exp.position, exp.start_date, exp.end_date, exp.responsibilities]
-          );
-        }
-      }
-  
-      // Commit the transaction
-      await db.exec('COMMIT');
-      
-      return NextResponse.json({ success: true, message: "Data Saved Successfully!" }, { status: 200 });
-    } catch (error) {
-      // Rollback the transaction on error
-      await db.exec('ROLLBACK');
-      
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+  const { id } = params;
+  const data = await request.json();
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
   }
 
-  export async function DELETE(request, { params }) {
-    const db = await openDB();
-    const { id } = params;
-  
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
-    }
-  
-    try {
-      // Start a transaction
-      await db.exec('BEGIN TRANSACTION');
-      
-      // Delete the record
-      await db.run('DELETE FROM Experience WHERE id = ?', [id]);
-      
-      // Commit the transaction
-      await db.exec('COMMIT');
-      
-      return NextResponse.json({ success: true, message: "Deleted Successfully!" }, { status: 200 });
-    } catch (error) {
-      // Rollback the transaction on error
-      await db.exec('ROLLBACK');
-      
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+  try {
+    const queries = data.map(exp => {
+      if (exp.id) {
+        // Update existing records
+        return {
+          text: `
+            UPDATE Experience
+            SET user_id = $1, company_name = $2, position = $3, start_date = $4, end_date = $5, responsibilities = $6
+            WHERE id = $7
+          `,
+          values: [id, exp.company_name, exp.position, exp.start_date, exp.end_date, exp.responsibilities, exp.id]
+        };
+      } else {
+        // Insert new records
+        return {
+          text: `
+            INSERT INTO Experience (user_id, company_name, position, start_date, end_date, responsibilities)
+            VALUES ($1, $2, $3, $4, $5, $6)
+          `,
+          values: [id, exp.company_name, exp.position, exp.start_date, exp.end_date, exp.responsibilities]
+        };
+      }
+    });
+
+    await runTransaction(queries);
+
+    return NextResponse.json({ success: true, message: "Data Saved Successfully!" }, { status: 200 });
+  } catch (error) {
+    console.error('Error saving data:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
+
+export async function DELETE(request, { params }) {
+  const { id } = params;
+
+  if (!id) {
+    return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+  }
+
+  try {
+    await queryDB('BEGIN');
+    await queryDB('DELETE FROM Experience WHERE id = $1', [id]);
+    await queryDB('COMMIT');
+
+    return NextResponse.json({ success: true, message: "Deleted Successfully!" }, { status: 200 });
+  } catch (error) {
+    await queryDB('ROLLBACK');
+    console.error('Error deleting data:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

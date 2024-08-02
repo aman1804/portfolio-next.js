@@ -1,65 +1,62 @@
+// app/api/projects/route.js
 import { NextResponse } from 'next/server';
-import { openDB } from '../../../../../lib/db';
+import { queryDB, runTransaction } from '../../../../../lib/db';
 
 export async function GET(req, { params }) {
   try {
-    const db = await openDB();
     const { id } = params;
+    const result = await queryDB('SELECT * FROM Projects WHERE user_id = $1', [id]);
+    const projects = result.rows; // Access rows from the result
 
-    const projects = await db.all('SELECT * FROM Projects WHERE user_id=?', [id]);
-    return NextResponse.json(projects , { status: 200 });
+    return NextResponse.json({ projects }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching data:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-
-
 export async function POST(request, { params }) {
-  const db = await openDB();
-  const data = await request.json();
   const { id } = params;
+  const data = await request.json();
 
   if (!Array.isArray(data) || data.length === 0) {
     return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
   }
 
   try {
-    // Start a transaction
-    await db.exec('BEGIN TRANSACTION');
-
-    for (const project of data) {
+    const queries = data.map(project => {
       if (project.id) {
         // Update existing records
-        await db.run(
-          `UPDATE Projects SET user_id = ?, title = ?, description = ?, url = ?, start_date = ?, end_date = ?, technologies = ?, github_link = ? WHERE id = ?`,
-          [id, project.title, project.description, project.url, project.start_date, project.end_date, project.technologies, project.github_link, project.id]
-        );
+        return {
+          text: `
+            UPDATE Projects
+            SET user_id = $1, title = $2, description = $3, url = $4, start_date = $5, end_date = $6, technologies = $7, github_link = $8
+            WHERE id = $9
+          `,
+          values: [id, project.title, project.description, project.url, project.start_date, project.end_date, project.technologies, project.github_link, project.id]
+        };
       } else {
         // Insert new records
-        await db.run(
-          `INSERT INTO Projects (user_id, title, description, url, start_date, end_date, technologies, github_link) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [id, project.title, project.description, project.url, project.start_date, project.end_date, project.technologies, project.github_link]
-        );
+        return {
+          text: `
+            INSERT INTO Projects (user_id, title, description, url, start_date, end_date, technologies, github_link)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          `,
+          values: [id, project.title, project.description, project.url, project.start_date, project.end_date, project.technologies, project.github_link]
+        };
       }
-    }
+    });
 
-    // Commit the transaction
-    await db.exec('COMMIT');
-    
+    await runTransaction(queries);
+
     return NextResponse.json({ success: true, message: "Data Saved Successfully!" }, { status: 200 });
   } catch (error) {
-    // Rollback the transaction on error
-    await db.exec('ROLLBACK');
-    
+    console.error('Error saving data:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function DELETE(request, { params }) {
-  const db = await openDB();
   const { id } = params;
 
   if (!id) {
@@ -67,20 +64,14 @@ export async function DELETE(request, { params }) {
   }
 
   try {
-    // Start a transaction
-    await db.exec('BEGIN TRANSACTION');
-    
-    // Delete the record
-    await db.run('DELETE FROM Projects WHERE id = ?', [id]);
-    
-    // Commit the transaction
-    await db.exec('COMMIT');
-    
+    await queryDB('BEGIN');
+    await queryDB('DELETE FROM Projects WHERE id = $1', [id]);
+    await queryDB('COMMIT');
+
     return NextResponse.json({ success: true, message: "Deleted Successfully!" }, { status: 200 });
   } catch (error) {
-    // Rollback the transaction on error
-    await db.exec('ROLLBACK');
-    
+    await queryDB('ROLLBACK');
+    console.error('Error deleting data:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

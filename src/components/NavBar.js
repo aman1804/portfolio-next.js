@@ -18,11 +18,11 @@ if (!showNavFooter) {
   return (
     <header className="mb-auto">
       <div>
-        <h3 className="float-md-start mb-0">Cover</h3>
+        <h3 className="float-md-start mb-0 text-capitalize">{process.env.NODE_ENV}</h3>
         <nav className="nav nav-masthead justify-content-center float-md-end">
           <Link className={`nav-link fw-bold py-1 px-0 ${pathname === "/" ? "active" : ""}`} aria-current={pathname === "/" ? "page" : undefined} href="/">Home</Link>
           <Link className={`nav-link fw-bold py-1 px-0 ${pathname === "/about" ? "active" : ""}`} href="/about">About</Link>
-          <Link className={`nav-link fw-bold py-1 px-0 ${pathname === "/login" ? "active" : ""}`} href="/admin">Services</Link>
+          {/* <Link className={`nav-link fw-bold py-1 px-0 ${pathname === "/login" ? "active" : ""}`} href="/admin">Services</Link> */}
           <Link className={`nav-link fw-bold py-1 px-0 ${pathname === "/projects" ? "active" : ""}`} href="/projects">Projects</Link>
           <Link className={`nav-link fw-bold py-1 px-0 ${pathname === "/contact" ? "active" : ""}`} href="/contact">Contact</Link>
         </nav>

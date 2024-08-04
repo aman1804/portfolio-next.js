@@ -26,7 +26,7 @@ const ContactForm = () => {
   return (
     <div className="container mt-5">
       <div className="row text-white-50">
-        <div className="col-sm-7">
+        <div className="col-sm-7 mb-3">
         <form onSubmit={handleSubmit} className='row text-start'>
         <div className="col-md-6 mb-3">
           <label htmlFor="name" className="form-label">Name</label>
@@ -82,7 +82,7 @@ const ContactForm = () => {
       </form>
         </div>
         <div className="col-sm-5 ">
-            <div className="card bg-transparent text-white-50 text-start ps-5">
+            <div className="card bg-transparent text-white-50 text-center text-sm-start ps-5">
             {/* <h2>Contact Information</h2> */}
           <p>
           <span className='fs-3 fw-bold text-custom-green'><i class="bi bi-envelope-at"></i> </span>

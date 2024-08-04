@@ -11,7 +11,7 @@ const Experiences = async() => {
   const experiences = data.experiences;
   return (
     <>
-      <div>
+      <div className=''>
               <span className="section-title text-primary mb-3 mb-sm-4">
                 Experiences
               </span>
@@ -28,7 +28,7 @@ const Experiences = async() => {
                         </li>
                         ))
                     ) : (
-                      <li>No Experiences Found</li>
+                      <li className='text-center text-white-50'>No Experiences Found</li>
                     )}
                        
                     </ul>

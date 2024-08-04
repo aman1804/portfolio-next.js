@@ -27,7 +27,9 @@ const Education = async() => {
               </div>
             ))
                     ) : (
-                      <div>No educations Found</div>
+                      <ul className="list-unstyled timeline-sm">
+                      <li className='text-center'>No educations Found</li>
+                      </ul>
                     )}
               
             </div>

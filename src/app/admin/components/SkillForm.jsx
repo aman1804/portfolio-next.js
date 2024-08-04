@@ -11,7 +11,7 @@ const SkillsForm = ({ userId }) => {
         setLoading(true);
         try {
             const response = await getData(`/api/skills/${userId}`);
-            if (response) {
+            if (response.skills && response.skills.length > 0) {
                 console.log(response);
                 setSkills(response.skills);
             }

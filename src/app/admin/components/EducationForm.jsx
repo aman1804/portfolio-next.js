@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { deleteData, getData, postData } from '../../../../lib/apiServices';
 import Spinner from '../helpers/Spinner';
+import { formatDateToYYYYMMDD } from '../helpers/formatDate';
 
 const EducationForm = ({ userId }) => {
     const [educations, setEducations] = useState([{
@@ -18,7 +19,7 @@ const EducationForm = ({ userId }) => {
         setLoading(true);
         try {
             const response = await getData(`/api/education/${userId}`);
-            if (response) {
+            if (response.education && response.education.length > 0) {
                 console.log(response);
                 setEducations(response.education);
             }
@@ -147,7 +148,7 @@ const EducationForm = ({ userId }) => {
                                 className="form-control"
                                 id={`start_date_${index}`}
                                 name="start_date"
-                                value={education.start_date}
+                                value={ formatDateToYYYYMMDD(education.start_date)}
                                 onChange={(e) => handleChange(index, e)}
                             />
                         </div>
@@ -158,7 +159,7 @@ const EducationForm = ({ userId }) => {
                                 className="form-control"
                                 id={`end_date_${index}`}
                                 name="end_date"
-                                value={education.end_date}
+                                value={ formatDateToYYYYMMDD(education.end_date)}
                                 onChange={(e) => handleChange(index, e)}
                             />
                         </div>

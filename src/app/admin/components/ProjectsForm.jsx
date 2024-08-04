@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { deleteData, getData, postData } from '../../../../lib/apiServices'; // Adjust the import based on your API service
 import Spinner from '../helpers/Spinner';
+import { formatDateToYYYYMMDD } from '../helpers/formatDate';
 
 const ProjectsForm = ({ userId }) => {
     const [projects, setProjects] = useState([{
@@ -19,7 +20,7 @@ const ProjectsForm = ({ userId }) => {
         setLoading(true);
         try {
             const response = await getData(`/api/projects/${userId}`); // Replace with your API endpoint
-            if (response) {
+            if (response.projects && response.projects.length > 0) {
                 console.log(response)
                 setProjects(response.projects);
             }
@@ -150,7 +151,7 @@ const ProjectsForm = ({ userId }) => {
                                 className="form-control"
                                 id={`start_date_${index}`}
                                 name="start_date"
-                                value={project.start_date}
+                                value={ formatDateToYYYYMMDD(project.start_date)}
                                 onChange={(e) => handleChange(index, e)}
                             />
                         </div>
@@ -161,7 +162,7 @@ const ProjectsForm = ({ userId }) => {
                                 className="form-control"
                                 id={`end_date_${index}`}
                                 name="end_date"
-                                value={project.end_date}
+                                value={ formatDateToYYYYMMDD(project.end_date)}
                                 onChange={(e) => handleChange(index, e)}
                             />
                         </div>

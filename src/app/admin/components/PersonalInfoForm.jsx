@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { getData_By_userId, postData } from '../../../../lib/apiServices'; // Update with the correct import path
+import { formatDateToYYYYMMDD } from '../helpers/formatDate';
 
 async function updatePersonalInfo(userId, formData) {
     try {
@@ -179,7 +180,7 @@ const PersonalInfoForm = ({ userId }) => {
                                 className="form-control"
                                 id="birthday"
                                 name="birthday"
-                                value={formData.birthday}
+                                value={ formatDateToYYYYMMDD(formData.birthday)}
                                 onChange={handleChange}
                             />
                         </div>

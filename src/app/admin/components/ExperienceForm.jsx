@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { deleteData, getData, postData } from '../../../../lib/apiServices';
 import Spinner from '../helpers/Spinner';
+import { formatDateToYYYYMMDD } from '../helpers/formatDate';
 
 const ExperienceForm = ({ userId }) => {
     const [experiences, setExperiences] = useState([{
@@ -17,7 +18,7 @@ const ExperienceForm = ({ userId }) => {
         setLoading(true);
         try {
             const response = await getData(`/api/experiences/${userId}`);
-            if (response) {
+            if (response && response.length > 0) {
                 console.log(response);
                 setExperiences(response);
             }
@@ -88,9 +89,9 @@ const ExperienceForm = ({ userId }) => {
     return (
         <div className="container mt-4">
             <h2>Experience Form</h2>
-            {loading ? (
+            {loading && (
                 <Spinner/>
-            ):(
+            )}
             <form onSubmit={handleSubmit}>
                 {experiences.map((experience, index) => (
                     <div className="row mb-3 p-3 border rounded" key={index}>
@@ -134,7 +135,7 @@ const ExperienceForm = ({ userId }) => {
                                 className="form-control"
                                 id={`start_date_${index}`}
                                 name="start_date"
-                                value={experience.start_date}
+                                value={ formatDateToYYYYMMDD(experience.start_date)}
                                 onChange={(e) => handleChange(index, e)}
                             />
                         </div>
@@ -145,7 +146,7 @@ const ExperienceForm = ({ userId }) => {
                                 className="form-control"
                                 id={`end_date_${index}`}
                                 name="end_date"
-                                value={experience.end_date}
+                                value={ formatDateToYYYYMMDD(experience.end_date)}
                                 onChange={(e) => handleChange(index, e)}
                             />
                         </div>
@@ -171,7 +172,6 @@ const ExperienceForm = ({ userId }) => {
                 </button>
                 <button type="submit" className="btn btn-success">Save</button>
             </form>
-            )}
         </div>
     );
 };

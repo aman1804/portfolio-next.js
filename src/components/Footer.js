@@ -1,11 +1,25 @@
-import React from 'react'
+import React from 'react';
 
 const Footer = () => {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="mt-auto text-white-50">
-    <p>Cover template for <a href={`${process.env.BASE_URL}`} className="text-white">Bootstrap</a>, by <a href="https://twitter.com/mdo" className="text-white">@mdo</a>.</p>
-  </footer>
-  )
-}
+      <div className="container d-flex justify-content-between align-items-center py-3">
+        <p className="mb-0">
+          &copy; {year} Your Company. All rights reserved.
+        </p>
+        <div>
+          <a href="https://github.com/your-github-username" className="text-white mx-2" aria-label="GitHub">
+            <i className="bi bi-github" style={{ fontSize: '20px' }}></i>
+          </a>
+          <a href="https://www.linkedin.com/in/your-linkedin-username/" className="text-white mx-2" aria-label="LinkedIn">
+            <i className="bi bi-linkedin" style={{ fontSize: '20px' }}></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+};
 
-export default Footer
+export default Footer;

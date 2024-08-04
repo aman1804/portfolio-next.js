@@ -34,7 +34,7 @@ const page = async () => {
             </li>
           ))
         ) : (
-          <li>No Projects Found</li>
+          <li className="text-center fs-2">No Projects Found</li>
         )}
         {/* Add more projects as needed */}
       </ol>
